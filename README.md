@@ -6,7 +6,7 @@ git clone https://github.com/Safijah/Mini-application-for-patients
 Restore nuget packages manager:
 Right click on Solutions -> Restore NuGet packages
 
-When you start the application, migrations are started automatically and the database is populated with data.
+When you start the application, migrations are started automatically and the database is filled in with data.
 
 (SuperAdmin): Username: safija.hubljar@edu.fit.ba Password: Test1_
 
