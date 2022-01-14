@@ -20,7 +20,7 @@ namespace Mini_application_for_patients.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return Redirect("/User/Login");
         }
 
         public IActionResult Privacy()

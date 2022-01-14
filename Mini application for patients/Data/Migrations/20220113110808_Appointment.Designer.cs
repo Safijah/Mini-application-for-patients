@@ -4,14 +4,16 @@ using Data.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220113110808_Appointment")]
+    partial class Appointment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,12 +34,7 @@ namespace Data.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PatientID")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("ID");
-
-                    b.HasIndex("PatientID");
 
                     b.ToTable("Appointment");
                 });
@@ -252,13 +249,6 @@ namespace Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("Data.EntityModels.Appointment", b =>
-                {
-                    b.HasOne("Data.EntityModels.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientID");
                 });
 
             modelBuilder.Entity("Data.EntityModels.Patient", b =>

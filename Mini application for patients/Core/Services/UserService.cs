@@ -3,6 +3,7 @@ using Data.DbContext;
 using Data.EntityModels;
 using Data.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -21,13 +22,15 @@ namespace Core.Services
         private IConfiguration _configuration;
         private AppDbContext _appDbContext;
         private RoleManager<IdentityRole> _roleManager;
+        private AppDbContext _dbContext;
         public UserService(UserManager<User> userManager, IConfiguration configuration, AppDbContext appDbContext, 
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager, AppDbContext dbContext)
         {
             _userManger = userManager;
             _configuration = configuration;
             _appDbContext = appDbContext;
             _roleManager = roleManager;
+            _dbContext = dbContext;
         }
         public async Task<ResultVM> RegistracijaAsync(RegisterVM model)
         {
@@ -45,7 +48,7 @@ namespace Core.Services
             if (model.Password != model.ConfirmedPassword)
                 return new ResultVM
                 {
-                    Message = "Passwords do not match",
+                    Message = "Passwords don't match",
                     IsSuccess = false,
                 };
 
@@ -136,6 +139,75 @@ namespace Core.Services
                 IsSuccess = true,
                 ExpireDate = token.ValidTo
             };
+        }
+        public async Task<GetAppointmentVM> DisplayAppointmentsAsync()
+        {
+            var list = await _dbContext.Appointment.Select(a => new GetAppointmentVM.Lista
+            {
+                Date = a.Date.ToString("dd/MM/yyyy hh:mm"),
+                ID = a.ID,
+                FirstName = _dbContext.Patient.Include(b => b.User).Where(b => b.ID == a.PatientID).FirstOrDefault().User.FirstName,
+                LastName = _dbContext.Patient.Include(b => b.User).Where(b => b.ID == a.PatientID).FirstOrDefault().User.LastName
+            }).ToListAsync();
+            var Appointments = new GetAppointmentVM();
+            Appointments.Appointment = list;
+            return Appointments;
+        }
+        public async Task<GetAppointmentVM> DisplayAppointmentsByIDAsync(string id)
+        {
+            var list = await _dbContext.Appointment.Include(a=>a.Patient).ThenInclude(a=>a.User).Where(a=>a.Patient.User.Email==id).Select(a => new GetAppointmentVM.Lista
+            {
+                Date = a.Date.ToString("dd/MM/yyyy hh:mm"),
+                ID = a.ID,
+                FirstName = _dbContext.Patient.Include(b => b.User).Where(b => b.ID == a.PatientID).FirstOrDefault().User.FirstName,
+                LastName = _dbContext.Patient.Include(b => b.User).Where(b => b.ID == a.PatientID).FirstOrDefault().User.LastName
+            }).ToListAsync();
+            var Appointments = new GetAppointmentVM();
+            Appointments.Appointment = list;
+            return Appointments;
+        }
+        public async Task<string> CheckUser(string Email)
+        {
+            var User = await _userManger.FindByEmailAsync(Email);
+            var RoleID =  _dbContext.UserRoles.Where(a => a.UserId == User.Id).FirstOrDefault().RoleId;
+            if(RoleID=="1")
+            {
+                return "Admin";
+            }
+            else
+            {
+                return "Patient";
+            }
+        }
+        public ResultVM AddAppointment(AddAppointmentVM a)
+        {
+            var Appointment =new Appointment()
+            {
+                Date = new DateTime(a.Date.Date.Year, a.Date.Date.Month, a.Date.Date.Day, a.Time.TimeOfDay.Hours, a.Time.TimeOfDay.Minutes, a.Time.TimeOfDay.Seconds),
+                PatientID = a.PatientID
+            };
+            _dbContext.Add(Appointment);
+            _dbContext.SaveChanges();
+            return new ResultVM()
+            {
+                Message = "Appointment successfully created",
+                IsSuccess = true
+            };
+        }
+        public async Task<GetAppointmentVM> DisplayAppointmentsBySearchAsync(SearchVM vm)
+        {
+            var list = await _dbContext.Appointment.Where(a => (a.Patient.ID == vm.PatientID || vm.PatientID=="0")
+            && (DateTime.Compare(vm.DateFrom,a.Date)<=0 || vm.DateFrom==null ) && (DateTime.Compare(vm.DateTo,a.Date)>=0 || vm.DateTo==null ) 
+            ).Select(a => new GetAppointmentVM.Lista
+            {
+                Date = a.Date.ToString("dd/MM/yyyy hh:mm"),
+                ID = a.ID,
+                FirstName = _dbContext.Patient.Include(b => b.User).Where(b => b.ID == a.PatientID).FirstOrDefault().User.FirstName,
+                LastName = _dbContext.Patient.Include(b => b.User).Where(b => b.ID == a.PatientID).FirstOrDefault().User.LastName
+            }).ToListAsync();
+            var Appointments = new GetAppointmentVM();
+            Appointments.Appointment = list;
+            return Appointments;
         }
     }
 }

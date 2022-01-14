@@ -11,6 +11,7 @@ namespace Mini_application_for_patients.Controllers
     public class UserController : Controller
     {
         private IUserService _userService;
+        static string Message;
         public UserController(IUserService userService)
         {
             _userService = userService;
@@ -20,9 +21,10 @@ namespace Mini_application_for_patients.Controllers
         {
             return View();
         }
-        public IActionResult Registration(ResultVM result)
+        public IActionResult Registration()
         {
-            TempData["Message"] = result.Message;
+            TempData["Message"] = Message;
+            Message = null;
             return View();
         }
         public async Task<IActionResult> RegisterAsync(RegisterVM register)
@@ -33,27 +35,35 @@ namespace Mini_application_for_patients.Controllers
                 if(rezultat.IsSuccess)
                 {
 
-                return View("Home");
+                    var rola = await _userService.CheckUser(register.Email);
+                    if (rola == "Admin")
+                    {
+
+                        return Redirect("/Admin/Appointments");
+                    }
+                    else
+                    {
+                        return Redirect("/Patient/Appointments?Email=" + register.Email);
+                    }
                 }
                 else
                 {
-                    return RedirectToAction("Registration",rezultat);
+                    Message = rezultat.Message;
+                    return RedirectToAction("Registration");
                 }
             }
             catch (Exception ex)
             {
-                var rezultat = new ResultVM()
-                {
-                    Message = ex.Message
-                };
+                Message = ex.Message;
 
-                return RedirectToAction("Registration", rezultat);
+                return RedirectToAction("Registration");
             }
-            return View();
+           
         }
-        public IActionResult Login(ResultVM result)
+        public IActionResult Login()
         {
-            TempData["Message"] = result.Message;
+            TempData["Message"] = Message;
+            Message = null;
             return View();
         }
         public async Task<IActionResult> LoginUserAsync(LoginVM login)
@@ -63,24 +73,30 @@ namespace Mini_application_for_patients.Controllers
                 var rezultat = await _userService.LoginUserAsync(login);
                 if (rezultat.IsSuccess)
                 {
+                    var rola = await _userService.CheckUser(login.Email);
+                    if(rola=="Admin")
+                    {
 
-                    return View("Home");
+                    return Redirect("/Admin/Appointments");
+                    }
+                    else
+                    {
+                        return Redirect("/Patient/Appointments?Email="+login.Email);
+                    }
                 }
                 else
                 {
-                    return RedirectToAction("Login", rezultat);
+                    Message = rezultat.Message;
+                    return RedirectToAction("Login");
                 }
             }
             catch (Exception ex)
             {
-                var rezultat = new ResultVM()
-                {
-                    Message = ex.Message
-                };
+                Message = ex.Message;
 
-                return RedirectToAction("Login", rezultat);
+                return RedirectToAction("Login");
             }
-            return View();
+            
         }
     }
 }

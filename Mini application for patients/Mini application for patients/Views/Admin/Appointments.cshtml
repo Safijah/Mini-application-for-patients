@@ -1,0 +1,80 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Mini_application_for_patients.Models.GetAppointmentVM
+<style>
+    .Data {
+        margin-top: 10%;
+    }
+    .form-control {
+        width: 200px;
+        border: 2px solid black;
+        margin-top: 3%;
+        display: inline-block;
+    }
+    #Date1
+    {
+        margin-left:5%;
+        
+    }
+    #Date2 {
+        margin-left: 8%;
+    }
+    .btn.btn-primary{
+        margin-left:20%;
+    }
+    #btn {
+        margin-left: 85%;
+        margin-top: 3%;
+        display: inline-block;
+    }
+    #btn2 {
+        margin-left: 53%;
+        margin-top: 2.4%;
+        display: inline-block;
+        position: absolute;
+    }
+</style>
+<div>
+    <div>
+        <input type="button" id="btn2" class="btn btn-primary" value="Add Patient" onclick="window.location='/Admin/AddPatient'"/>
+        <input type="button" id="btn" class="btn btn-primary" value="Add Appointment" onclick="window.location='/Admin/AddAppointment'"/>
+    </div>
+    <form asp-controller="Admin" asp-action="Search">
+        <div class="Search">
+            <select class="form-control" asp-for="PatientID" asp-items="@Model.Patients">
+                <option value="0">Select patient</option>
+            </select>
+            <input id="Date1" class="form-control" type="date" asp-for="DateFrom" />
+            <input id="Date2" class="form-control" type="date" asp-for="DateTo" />
+            <input type="submit" class="btn btn-primary" value="Search" />
+        </div>
+    </form>
+    <div class="Data">
+        <table class="table">
+            <tr>
+                <td scope="col">ID</td>
+                <td scope="col">FirstName</td>
+                <td scope="col">LastName</td>
+                <td scope="col">Date</td>
+
+
+            </tr>
+            <tbody>
+                @foreach (var x in Model.Appointment)
+                {
+                    <tr scope="row">
+                        <td>@x.ID</td>
+                        <td>@x.FirstName</td>
+                        <td>@x.LastName</td>
+                        <td>@x.Date</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

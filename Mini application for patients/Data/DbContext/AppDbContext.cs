@@ -13,6 +13,7 @@ namespace Data.DbContext
         {
         }
         public DbSet<Patient> Patient { get; set; }
+        public DbSet<Appointment> Appointment { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             

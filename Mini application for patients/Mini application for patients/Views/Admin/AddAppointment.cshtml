@@ -1,0 +1,67 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model Mini_application_for_patients.Models.AppointmentVM
+@*<form align="center">
+    <label>Patient</label>
+    <br />
+    <select  asp-for="PatientID" asp-items="@Model.Patients" required></select> 
+    <br />
+    <label>Date</label>
+    <br />
+    <input type="date" asp-for="Date"/>
+    <br />
+    <input type='time' step="3600" asp-for="Time"/>
+    <br />
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>*@
+<style>
+    .form {
+        margin-top: 10%;
+        
+    }
+    body {
+        border: 2px solid gray;
+        border-radius: 15px;
+        margin-top: 5%;
+        margin-left:2%;
+        margin-right:2%;
+        
+    }
+    .form-control {
+        border: 2px solid black;
+       
+    }
+    .btn-primary {
+        margin-left: 37%;
+        display: inline-block;
+        position: absolute;
+    }
+    .btn-light {
+        margin-left: 38%;
+        display: inline-block;
+    }
+</style>
+<div class="Main">
+<form class="form" asp-action="SaveAppointment" asp-controller="Admin">
+    <div class="form-group">
+        <label>Patient</label>
+        <select class="form-control"  asp-for="PatientID" asp-items="@Model.Patients" required></select>
+    </div>
+    <div class="form-group">
+        <label>Date</label>
+       <input class="form-control"  type="date" asp-for="Date" />
+    </div>
+    <div class="form-group">
+        <label>Time</label>
+        <input class="form-control"  type='time' step="3600" asp-for="Time" />
+
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Add</button>
+    </div>
+</form>
+ </div>
+        <button class="btn btn-light" onclick="window.location='/Admin/Appointments'">Close</button>   

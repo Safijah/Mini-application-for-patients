@@ -4,14 +4,16 @@ using Data.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220113112631_Relationship")]
+    partial class Relationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,12 +34,15 @@ namespace Data.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PatientID")
+                    b.Property<int>("PatientID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PatientID1")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ID");
 
-                    b.HasIndex("PatientID");
+                    b.HasIndex("PatientID1");
 
                     b.ToTable("Appointment");
                 });
@@ -258,7 +263,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.EntityModels.Patient", "Patient")
                         .WithMany()
-                        .HasForeignKey("PatientID");
+                        .HasForeignKey("PatientID1");
                 });
 
             modelBuilder.Entity("Data.EntityModels.Patient", b =>
